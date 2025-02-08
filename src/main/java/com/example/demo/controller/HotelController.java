@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.HotelCreateDTO;
 import com.example.demo.dto.HotelDTO;
 import com.example.demo.dto.HotelDetailsDTO;
 import com.example.demo.entity.Hotel;
@@ -45,4 +46,9 @@ public class HotelController {
         return ResponseEntity.ok(hotelDTO);
     }
 
+    @PostMapping("/")
+    public ResponseEntity<HotelDTO> createHotel(@RequestBody HotelCreateDTO hotelCreateDTO) {
+        HotelDTO hotelDTO = hotelService.createHotel(hotelCreateDTO);
+        return ResponseEntity.ok(hotelDTO);
+    }
 }
