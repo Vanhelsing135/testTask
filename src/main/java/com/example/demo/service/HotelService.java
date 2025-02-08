@@ -80,4 +80,14 @@ public class HotelService {
                 amenities
         );
     }
+
+    public List<HotelDTO> getBySearchingCriteria(String name, String brand, String city, String country, List<String> amenities) {
+        List<Hotel> hotels = hotelRepository.findBySearchCriteria(name, brand, city, country, amenities);
+
+        if (hotels.isEmpty()) {
+            throw new EntityNotFoundException("No hotels found matching the search criteria.");
+        }
+
+        return hotels.stream().map(this::convertToDTO).toList();
+    }
 }
