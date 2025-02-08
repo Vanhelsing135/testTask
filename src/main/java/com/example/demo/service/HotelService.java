@@ -1,9 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.*;
-import com.example.demo.entity.Address;
-import com.example.demo.entity.Amenity;
-import com.example.demo.entity.Hotel;
+import com.example.demo.entity.*;
 import com.example.demo.repository.HotelRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,5 +87,40 @@ public class HotelService {
         }
 
         return hotels.stream().map(this::convertToDTO).toList();
+    }
+
+    public HotelDTO createHotel(HotelCreateDTO hotelCreateDTO) {
+        Hotel hotel = new Hotel();
+        hotel.setName(hotelCreateDTO.getName());
+        if (hotelCreateDTO.getName() == null) {
+            throw new IllegalArgumentException("field 'name' cannot be empty!");
+        }
+        hotel.setDescription(hotelCreateDTO.getDescription());
+        hotel.setBrand(hotelCreateDTO.getBrand());
+
+        Address address = new Address();
+        AddressDTO addressDTO = hotelCreateDTO.getAddress();
+        address.setCity(addressDTO.getCity());
+        address.setCountry(addressDTO.getCountry());
+        address.setStreet(addressDTO.getStreet());
+        address.setPostCode(addressDTO.getPostCode());
+        address.setHouseNumber(addressDTO.getHouseNumber());
+        hotel.setAddress(address);
+
+        Contact contact = new Contact();
+        ContactDTO contactDTO = hotelCreateDTO.getContact();
+        contact.setEmail(contactDTO.getEmail());
+        contact.setPhone(contactDTO.getPhone());
+        hotel.setContact(contact);
+
+        ArrivalTime arrivalTime = new ArrivalTime();
+        ArrivalTimeDTO arrivalTimeDTO = hotelCreateDTO.getArrivalTime();
+        arrivalTime.setCheckIn(arrivalTimeDTO.getCheckIn());
+        arrivalTime.setCheckOut(arrivalTimeDTO.getCheckOut());
+        hotel.setArrivalTime(arrivalTime);
+
+        hotel = hotelRepository.save(hotel);
+
+        return convertToDTO(hotel);
     }
 }
