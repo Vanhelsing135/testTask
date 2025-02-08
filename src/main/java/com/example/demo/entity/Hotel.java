@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Hotel")
@@ -48,5 +49,10 @@ public class Hotel {
     })
     private ArrivalTime arrivalTime;
 
+    @OneToMany
+    @JoinTable(name = "Hotel_amenities",
+            joinColumns = @JoinColumn(name = "hotel_id"),
+            inverseJoinColumns = @JoinColumn(name = "amenity_id"))
+    private List<Amenity> amenities;
 }
 
