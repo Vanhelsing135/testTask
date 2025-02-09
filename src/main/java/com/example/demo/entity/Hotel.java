@@ -49,7 +49,7 @@ public class Hotel {
     })
     private ArrivalTime arrivalTime;
 
-    @OneToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "Hotel_amenities",
             joinColumns = @JoinColumn(name = "hotel_id"),
             inverseJoinColumns = @JoinColumn(name = "amenity_id"))

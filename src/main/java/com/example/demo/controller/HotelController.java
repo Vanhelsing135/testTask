@@ -51,4 +51,10 @@ public class HotelController {
         HotelDTO hotelDTO = hotelService.createHotel(hotelCreateDTO);
         return ResponseEntity.ok(hotelDTO);
     }
+
+    @PostMapping("{id}/amenities")
+    public ResponseEntity<HotelDetailsDTO> addAmenities(@PathVariable int id, @RequestBody List<String> amenities) {
+        HotelDetailsDTO updHotel = hotelService.addAmenities(id, amenities);
+        return ResponseEntity.ok(updHotel);
+    }
 }

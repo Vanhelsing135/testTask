@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.*;
 import com.example.demo.entity.*;
+import com.example.demo.repository.AmenityRepository;
 import com.example.demo.repository.HotelRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,12 @@ import java.util.List;
 @Service
 public class HotelService {
     private final HotelRepository hotelRepository;
+    private final AmenityRepository amenityRepository;
 
     @Autowired
-    public HotelService(HotelRepository hotelRepository) {
+    public HotelService(HotelRepository hotelRepository, AmenityRepository amenityRepository) {
         this.hotelRepository = hotelRepository;
+        this.amenityRepository = amenityRepository;
     }
 
     public List<HotelDTO> getAllHotels() {
@@ -122,5 +125,29 @@ public class HotelService {
         hotel = hotelRepository.save(hotel);
 
         return convertToDTO(hotel);
+    }
+
+    public HotelDetailsDTO addAmenities(int hotelId, List<String> amenities) {
+        Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new EntityNotFoundException("Hotel with id " + hotelId + " not found"));
+
+        if (hotel.getAmenities() == null) {
+            hotel.setAmenities(new ArrayList<>());
+        }
+
+        for (String amenityName : amenities) {
+            Amenity amenity = amenityRepository.findByName(amenityName)
+                    .orElseGet(() -> {
+                        Amenity newAmenity = new Amenity();
+                        newAmenity.setName(amenityName);
+                        return amenityRepository.save(newAmenity);
+                    });
+
+            if (!hotel.getAmenities().contains(amenity)) {
+                hotel.getAmenities().add(amenity);
+            }
+        }
+
+        hotelRepository.save(hotel);
+        return convertToDetailsDTO(hotel);
     }
 }
