@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/hotels")
@@ -42,7 +43,7 @@ public class HotelController {
             @RequestParam(value = "city", required = false) String city,
             @RequestParam(value = "amenities", required = false) List<String> amenities
     ) {
-        List<HotelDTO> hotelDTO = hotelService.getBySearchingCriteria(name, brand, country, city, amenities);
+        List<HotelDTO> hotelDTO = hotelService.getBySearchingCriteria(name, brand, city, country, amenities);
         return ResponseEntity.ok(hotelDTO);
     }
 
@@ -56,5 +57,11 @@ public class HotelController {
     public ResponseEntity<HotelDetailsDTO> addAmenities(@PathVariable int id, @RequestBody List<String> amenities) {
         HotelDetailsDTO updHotel = hotelService.addAmenities(id, amenities);
         return ResponseEntity.ok(updHotel);
+    }
+
+    @GetMapping("/histogram/{param}")
+    public ResponseEntity<Map<String, Long>> createHistogramByParameter(@PathVariable String param) {
+        Map<String, Long> histogram = hotelService.createHistogramByParam(param);
+        return ResponseEntity.ok(histogram);
     }
 }
