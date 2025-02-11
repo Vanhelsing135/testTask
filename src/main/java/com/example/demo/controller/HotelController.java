@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/hotels")
+@RequestMapping("/property-view/hotels")
 public class HotelController {
     private final HotelService hotelService;
 
