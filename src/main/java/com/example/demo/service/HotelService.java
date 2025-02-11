@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class HotelService {
@@ -85,6 +88,15 @@ public class HotelService {
     public List<HotelDTO> getBySearchingCriteria(String name, String brand, String city, String country, List<String> amenities) {
         List<Hotel> hotels = hotelRepository.findBySearchCriteria(name, brand, city, country, amenities);
 
+        if (amenities != null && !amenities.isEmpty()) {
+            hotels = hotels.stream().filter(hotel -> {
+                List<String> hotelAmenities = hotel.getAmenities().stream()
+                        .map(Amenity::getName)
+                        .toList();
+                return hotelAmenities.containsAll(amenities);
+            }).toList();
+        }
+
         if (hotels.isEmpty()) {
             throw new EntityNotFoundException("No hotels found matching the search criteria.");
         }
@@ -128,6 +140,9 @@ public class HotelService {
     }
 
     public HotelDetailsDTO addAmenities(int hotelId, List<String> amenities) {
+        if (amenities == null || amenities.isEmpty()) {
+            throw new IllegalArgumentException("amenities cannot be empty or null!");
+        }
         Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new EntityNotFoundException("Hotel with id " + hotelId + " not found"));
 
         if (hotel.getAmenities() == null) {
@@ -149,5 +164,32 @@ public class HotelService {
 
         hotelRepository.save(hotel);
         return convertToDetailsDTO(hotel);
+    }
+
+    public Map<String, Long> createHistogramByParam(String param) {
+        switch (param.toLowerCase()) {
+            case "city":
+                return hotelRepository.groupByCity().stream()
+                        .collect(Collectors.toMap(a -> (String) a[0], a -> (Long) a[1]));
+            case "brand":
+                return hotelRepository.groupByBrand().stream()
+                        .collect(Collectors.toMap(a -> (String) a[0], a -> (Long) a[1]));
+            case "country":
+                return hotelRepository.groupByCountry().stream()
+                        .collect(Collectors.toMap(a -> (String) a[0], a -> (Long) a[1]));
+            case "amenities":
+                Map<String, Long> histogram = hotelRepository.groupByAmenities().stream()
+                        .collect(Collectors.toMap(a -> (String) a[0], a -> (Long) a[1]));
+                ;
+                List<String> allAmenities = amenityRepository.findAll().stream()
+                        .map(Amenity::getName).toList();
+
+                for (String nameOfAmenity : allAmenities) {
+                    histogram.putIfAbsent(nameOfAmenity, 0L);
+                }
+                return histogram;
+            default:
+                throw new IllegalArgumentException("Invalid parameter! Parameter must be in [city, brand, country, amenities]");
+        }
     }
 }
