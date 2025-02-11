@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Integer> {
@@ -30,4 +31,6 @@ public interface HotelRepository extends JpaRepository<Hotel, Integer> {
 
     @Query("select amenity.name, COUNT(h) from Hotel h join h.amenities amenity group by amenity.name")
     List<Object[]> groupByAmenities();
+
+    Optional<Hotel> findByName(String name);
 }
