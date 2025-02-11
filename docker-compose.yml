@@ -13,13 +13,15 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  flyway:
-    image: flyway/flyway
-    command: -url=jdbc:mysql://db:3306/testTask_db?allowPublicKeyRetrieval=true -user=root -password=1234 -locations=filesystem:/flyway/sql migrate
-    volumes:
-      - ./flyway/sql:/flyway/sql
-    depends_on:
-      - db
+  liquibase:
+   image: liquibase/liquibase:4.4.0
+   container_name: liquibase-container
+   command: --url=jdbc:mysql://db:3306/testTask_db --username=root --password=1234 --changeLogFile=classpath:db/changelog/db.changelog-master.xml update
+   volumes:
+     - ./src/main/resources/db/changelog:/liquibase/classpath/db/changelog
+   depends_on:
+     - db
+
 
 volumes:
   db_data:
