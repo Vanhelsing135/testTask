@@ -23,7 +23,7 @@ public class Hotel {
     private int id;
     //    @ElementCollection
     //    private ArrayList<String> amenities;
-    @Getter
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
     private String brand;
     private String description;

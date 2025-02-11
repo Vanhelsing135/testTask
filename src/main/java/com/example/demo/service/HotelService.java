@@ -8,10 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,6 +102,15 @@ public class HotelService {
     }
 
     public HotelDTO createHotel(HotelCreateDTO hotelCreateDTO) {
+        if (hotelCreateDTO.getName() == null || hotelCreateDTO.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Field 'name' cannot be empty or null!");
+        }
+
+        Optional<Hotel> existingHotels = hotelRepository.findByName(hotelCreateDTO.getName());
+        if (!existingHotels.isEmpty()) {
+            throw new IllegalArgumentException("Hotel with name '" + hotelCreateDTO.getName() + "' already exists!");
+        }
+
         Hotel hotel = new Hotel();
         hotel.setName(hotelCreateDTO.getName());
         if (hotelCreateDTO.getName() == null) {
